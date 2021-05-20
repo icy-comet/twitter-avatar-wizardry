@@ -1,3 +1,4 @@
+## Example Image
 ![example](example.png)
 ## Introduction
 A Python recreation of the popular tool [blackmagic.so](https://blackmagic.so) created by [Tony Dinh](https://github.com/trungdq88).
