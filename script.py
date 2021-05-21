@@ -3,16 +3,16 @@ from dotenv import load_dotenv
 import math, os, urllib.request, time, json
 import tweepy
 
-# common option variables
+# customize
 screen_name='AniketTeredesai'
 target = 100
 primary_arc_color = '#d2d2d2'
 secondary_arc_color = '#2e2e2e'
 
-# cached followers count
+# load cached followers count
 with open('data.json', 'r') as f:
     data = json.load(f)
-current_count = data['followers_count']
+cached_count = data['followers_count']
 
 # load environment variables
 load_dotenv()
@@ -31,7 +31,7 @@ auth = tweepy.OAuthHandler(APP_KEY, APP_SECRET)
 auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
 api = tweepy.API(auth)
 
-def get_followers_count():
+def get_followers_count(screen_name):
     user = api.get_user(screen_name=screen_name, include_entities=False)
     followers_count = user.followers_count
     print('fetched followers count')
@@ -40,20 +40,10 @@ def get_followers_count():
 def calculate_progress(followers, target):
     percentage = (followers/target)*100
     angle = (360*percentage)/100
-    print('calculations completed')
+    print('completed calculations')
     return [f'{int(percentage)}%', angle]
 
-def get_new_profile_img():
-    user = api.get_user(screen_name=screen_name, include_entities=False)
-    print('fetched profile url')
-    img_url = user.profile_image_url_https.replace('_normal', '_400x400')
-    file, _ = urllib.request.urlretrieve(img_url)
-    img = Image.open(file).convert('RGB')
-    img = img.resize((400, 400)) #just to be safe
-    img.save('profile.jpg')
-    print('fetched avatar')
-
-def create_progress_ring(percentage, fill_angle):
+def create_progress_ring(percentage, fill_angle, bg_arc_clr, top_arc_clr):
     #some configurations
     ring_width = 46
     R = center_x = center_y = 379 #radius of the circle minus half of the ring_width + 2 offset
@@ -62,8 +52,8 @@ def create_progress_ring(percentage, fill_angle):
 
     ring_bg = Image.new("RGBA", (800, 800), (0, 0, 0, 0))
     ring = ImageDraw.Draw(ring_bg)
-    ring.arc([(0,0), ring_bg.size], start=0, end=360, fill=primary_arc_color, width=ring_width)
-    ring.arc([(0, 0), ring_bg.size], start=-90, end=fill_angle, fill=secondary_arc_color, width=ring_width)
+    ring.arc([(0,0), ring_bg.size], start=0, end=360, fill=bg_arc_clr, width=ring_width)
+    ring.arc([(0, 0), ring_bg.size], start=-90, end=fill_angle, fill=top_arc_clr, width=ring_width)
     text_x = R * math.cos(math.radians(fill_angle-5)) + center_x + 2 # another +2 offset
     text_y = R * math.sin(math.radians(fill_angle-5)) + center_y + 2
     ring.text((text_x, text_y), percentage, (255, 255, 255), font=font)
@@ -78,37 +68,42 @@ def upload_avatar():
     api.update_profile_image(filename='upload.jpg')
     print('Upload Success!')
 
-def give_menu():
-    global current_count
-    res = input('enter c to clear cached profile image and count or p to just start polling changes:\n').lower()
-    if res == 'c':
-        get_new_profile_img()
-        current_count = 0
-        start_polling()
-    elif res == 'p':
-        start_polling()
-    else:
-        print('invalid response. quitting...')
+def get_new_profile_img(screen_name):
+    user = api.get_user(screen_name=screen_name, include_entities=False)
+    print('fetched profile url')
+    img_url = user.profile_image_url_https.replace('_normal', '_400x400')
+    file, _ = urllib.request.urlretrieve(img_url)
+    img = Image.open(file).convert('RGB')
+    img = img.resize((400, 400)) #just to be safe
+    img.save('profile.jpg')
+    print('fetched avatar')
 
-def start_polling():
-    global current_count
+def start_polling(screen_name,target, cached_count, bg_arc_clr, top_arc_clr):
     while True:
         try:
-            followers_count = get_followers_count()
-            if followers_count != current_count:
-                print('change in followers detected')
-                current_count = followers_count
-                obj = {'followers_count': current_count}
+            followers_count = get_followers_count(screen_name)
+            if followers_count != cached_count:
+                print('detected change in followers')
+                cached_count = followers_count
+                cached_obj = {'followers_count': cached_count}
                 with open('data.json', 'w') as f:
-                    json.dump(obj, f)
-                create_progress_ring(*calculate_progress(followers_count, target))
+                    json.dump(cached_obj, f)
+                create_progress_ring(*calculate_progress(followers_count, target), bg_arc_clr, top_arc_clr)
                 upload_avatar()
             else:
                 print('no change detected')
             time.sleep(60)
-            print('next iteration')
+            print('checking again...')
         except KeyboardInterrupt:
             print('exit')
             break
 
-give_menu()
+menu_res = input('type `reset` to start the script from scratch or `poll` to use cached data from previous run\n').lower()
+if menu_res == 'reset':
+    get_new_profile_img(screen_name)
+    cached_count = 0
+    start_polling(screen_name, target, cached_count, primary_arc_color, secondary_arc_color)
+elif menu_res == 'poll':
+    start_polling(screen_name, target, cached_count, primary_arc_color, secondary_arc_color)
+else:
+    print('invalid response. quitting...')
