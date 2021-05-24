@@ -1,10 +1,10 @@
-## Example Image
-![example](example.png)
-
 ## Introduction
 A Python recreation of the popular tool [blackmagic.so](https://blackmagic.so) created by [Tony Dinh](https://github.com/trungdq88).
 
 The script automatically updates your Twitter profile image as your Followers change to reflect your progress towards the desired number of followers with a progress bar.
+
+## Example Image
+![example](example.png)
 
 ## Setup
 
@@ -30,7 +30,7 @@ You can also customize the colors of the progress bar created and your target nu
 
 ```
 screen_name='<your Twitter username>'
-target = <target followers>
+progress_mark = <show progress towards every leap (e.g. for every 100 followers)>
 primary_arc_color = '<hex color>'
 secondary_arc_color = '<hex color>'
 ```

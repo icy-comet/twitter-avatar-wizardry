@@ -1,11 +1,12 @@
+# imports
+import math, os, urllib.request, time, json
 from PIL import Image, ImageDraw, ImageFont
 from dotenv import load_dotenv
-import math, os, urllib.request, time, json
 import tweepy
 
 # customize
 screen_name='AniketTeredesai'
-target = 100
+progress_mark = 100 #show progress for every 100 followers
 primary_arc_color = '#d2d2d2'
 secondary_arc_color = '#2e2e2e'
 
@@ -37,8 +38,8 @@ def get_followers_count(screen_name):
     print('fetched followers count')
     return followers_count
 
-def calculate_progress(followers, target):
-    percentage = (followers/target)*100
+def calculate_progress(followers, progress_mark):
+    percentage = ((followers%progress_mark)/progress_mark)*100
     angle = (360*percentage)/100
     print('completed calculations')
     return [f'{int(percentage)}%', angle]
@@ -78,7 +79,7 @@ def get_new_profile_img(screen_name):
     img.save('profile.jpg')
     print('fetched avatar')
 
-def start_polling(screen_name,target, cached_count, bg_arc_clr, top_arc_clr):
+def start_polling(screen_name, progress_mark, cached_count, bg_arc_clr, top_arc_clr):
     while True:
         try:
             followers_count = get_followers_count(screen_name)
@@ -88,7 +89,7 @@ def start_polling(screen_name,target, cached_count, bg_arc_clr, top_arc_clr):
                 cached_obj = {'followers_count': cached_count}
                 with open('data.json', 'w') as f:
                     json.dump(cached_obj, f)
-                create_progress_ring(*calculate_progress(followers_count, target), bg_arc_clr, top_arc_clr)
+                create_progress_ring(*calculate_progress(followers_count, progress_mark), bg_arc_clr, top_arc_clr)
                 upload_avatar()
             else:
                 print('no change detected')
@@ -98,12 +99,15 @@ def start_polling(screen_name,target, cached_count, bg_arc_clr, top_arc_clr):
             print('exit')
             break
 
-menu_res = input('type `reset` to start the script from scratch or `poll` to use cached data from previous run\n').lower()
-if menu_res == 'reset':
-    get_new_profile_img(screen_name)
-    cached_count = 0
-    start_polling(screen_name, target, cached_count, primary_arc_color, secondary_arc_color)
-elif menu_res == 'poll':
-    start_polling(screen_name, target, cached_count, primary_arc_color, secondary_arc_color)
-else:
-    print('invalid response. quitting...')
+try:
+    menu_res = input('type `reset` to start the script from scratch or `poll` to use cached data from previous run\n').lower()
+    if menu_res == 'reset':
+        get_new_profile_img(screen_name)
+        cached_count = 0
+        start_polling(screen_name, progress_mark, cached_count, primary_arc_color, secondary_arc_color)
+    elif menu_res == 'poll':
+        start_polling(screen_name, progress_mark, cached_count, primary_arc_color, secondary_arc_color)
+    else:
+        print('invalid response. quitting...')
+except KeyboardInterrupt:
+    print('quitting...')
