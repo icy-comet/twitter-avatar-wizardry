@@ -7,13 +7,6 @@ from PIL import Image, ImageDraw, ImageFont
 h_w = 400 # square image
 base_size = (h_w, h_w)
 
-def calculate_progress(followers: int, track_mark: int) -> Tuple[int, float]:
-    # followers % track_mark helps calulate progress for every lapse of desired followers
-    percentage = ((followers%track_mark)/track_mark)*100
-    angle = (percentage/100)*360
-    print('completed calculations')
-    return (int(percentage), float(angle))
-
 def create_circular_mask(size: Tuple[float, float], angle: Optional[float] = 360) -> Image.Image:
     """Return a circular/sliced alpha-mask image.
 

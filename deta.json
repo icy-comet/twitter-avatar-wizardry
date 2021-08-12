@@ -1,6 +1,6 @@
 {
-    "name": "Blue Tricks",
-    "description": "Track your Twitter progress right on your profile image!", 
+    "name": "Twitter Wizardry",
+    "description": "Track your Twitter progress right in your profile image!", 
     "env": [
         {
             "key": "DETA_PROJECT_KEY",

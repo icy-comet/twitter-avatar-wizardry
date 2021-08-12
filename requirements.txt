@@ -1,4 +1,3 @@
-fastapi==0.68.0
 Pillow==8.3.1
 tweepy==3.10.0
 deta==1.0.0
