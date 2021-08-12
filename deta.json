@@ -1,0 +1,42 @@
+{
+    "name": "Blue Tricks",
+    "description": "Track your Twitter progress right on your profile image!", 
+    "env": [
+        {
+            "key": "DETA_PROJECT_KEY",
+            "description": "Deta's Project Key to instantiate Base.",
+            "value": "",
+            "required": true
+        }, 
+        {
+            "key": "TWITTER_KEY",
+            "description": "Twitter API Consumer Key",
+            "value": "",
+            "required": true
+        },
+        {
+            "key": "TWITTER_SECRET",
+            "description": "Twitter API Consumer Secret Key",
+            "value": "",
+            "required": true
+        },
+        {
+            "key": "ACCESS_TOKEN",
+            "description": "Twitter API User Access Token",
+            "value": "",
+            "required": true
+        },
+        {
+            "key": "ACCESS_TOKEN",
+            "description": "Twitter API OAuth Access Token",
+            "value": "",
+            "required": true
+        },
+        {
+            "key": "ACCESS_TOKEN_SECRET",
+            "description": "Twitter API OAuth Access Token Secret",
+            "value": "",
+            "required": true
+        }
+    ]
+}

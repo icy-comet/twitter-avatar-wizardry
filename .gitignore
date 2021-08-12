@@ -1,4 +1,7 @@
 .env
 *.code-workspace
-*.jpg
+example*
 venv/
+.vscode/
+tmp*
+.deta/
