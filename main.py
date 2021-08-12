@@ -4,7 +4,7 @@ from io import BytesIO
 from typing import Any
 from twitter import User
 from config import Config
-from image import create_slice, create_composite, calculate_progress
+from image import create_slice, composite_avatar, calculate_progress
 from deta import app, Deta
 
 deta = Deta(getenv("DETA_PROJECT_KEY"))
@@ -36,11 +36,11 @@ def cron_job(event: Any):
         base_img_buffer = BytesIO(base64.b64decode(cache["og_avatar"].encode("utf-8")))
 
         if Config.use_gradient:
-            slice_img = create_slice(slice_angle, str(percent_progress)+"%", Config.txt_color, gradient=Config.arc_gradient)
-            composite_img = create_composite(base_img_buffer, slice_img, slice_angle, gradient=Config.base_gradient)
+            slice_img = create_slice(angle=slice_angle, txt=str(percent_progress)+"%", txt_color=Config.txt_color, font=Config.font_file, gradient=Config.arc_gradient)
+            composite_img = composite_avatar(base_img_buffer, slice_img, slice_angle, gradient=Config.base_gradient)
         else:
-            slice_img = create_slice(slice_angle, str(percent_progress)+"%", Config.txt_color, slice_color=Config.arc_solid_clr)
-            composite_img = create_composite(base_img_buffer, slice_img, slice_angle, base_fill_clr=Config.base_solid_clr)
+            slice_img = create_slice(angle=slice_angle, txt=str(percent_progress)+"%", txt_color=Config.txt_color, font=Config.font_file, arc_clr=Config.arc_solid_clr)
+            composite_img = composite_avatar(base_img_buffer, slice_img, slice_angle, base_clr=Config.base_solid_clr)
 
         new_avatar = BytesIO()
         composite_img.save(new_avatar, "PNG")
