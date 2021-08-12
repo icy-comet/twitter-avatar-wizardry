@@ -1,6 +1,5 @@
 .env
 *.code-workspace
-example*
 venv/
 .vscode/
 tmp*
