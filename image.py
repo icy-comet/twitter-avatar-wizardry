@@ -8,19 +8,14 @@ h_w = 400 # square image
 base_size = (h_w, h_w)
 
 def create_circular_mask(size: Tuple[float, float], angle: Optional[float] = 360) -> Image.Image:
-    """Return a circular/sliced alpha-mask image.
+    """Create and return a circle/pieslice mask for any image.
 
-    Parameters
-    ----------
-    size : Tuple[float, float]
-        A tuple with (height, width) of the image to be masked.
-    ell_end : float, optional
-        Angle to be covered by pieslice, by default 360 (full circle)
+    Args:
+        size (Tuple[float, float]): A tuple containing image's (height, width).
+        angle (Optional[float], optional): Pieslice's angle if necessary. Defaults to 360.
 
-    Returns
-    -------
-    Image.Image
-        Alpha mask.
+    Returns:
+        Image.Image: The alpha-scheme mask image.
     """
 
     h, w = size
@@ -29,33 +24,19 @@ def create_circular_mask(size: Tuple[float, float], angle: Optional[float] = 360
     ImageDraw.Draw(alpha_image).pieslice([(0, 0), mask_size], start=-90, end=angle-90, fill=255)
     return alpha_image.resize(size=size, resample=Image.LANCZOS)
 
-def create_slice(angle: float,
-                 txt: str,
-                 font_file: str,
-                 txt_color: str = "#000000",
-                 arc_clr: str = "#ffffff",
-                 gradient: Union[str, BytesIO] = None) -> Image.Image:
-    """Return a new image with a slice with passed specs.
+def create_slice(angle: float, txt: str, font_file: str, txt_color: str = "#000000", arc_clr: str = "#ffffff", gradient: Union[str, BytesIO] = None) -> Tuple[Image.Image, Image.Image]:
+    """Create a new image with a pieslice and its mask.
 
-    Parameters
-    ----------
-    angle : float
-        Angle the pieslice occupies out of 360.
-    txt : str
-        Text string to print on slice.
-    font_file : str
-        Path to the font file in use.
-    txt_color : str, optional
-        Text color on the ring, by default "#000000"
-    arc_clr : str, optional
-        Hex color to fill the slice with, by default "#ffffff"
-    gradient : Union[str, BytesIO], optional
-        Gradient file's bytes/path to be used, by default None
+    Args:
+        angle (float): The angle the pieslice will cover out of 360.
+        txt (str): Percent text to print on the slice.
+        font_file (str): Path to the font's file to be used.
+        txt_color (str, optional): Text's color. Defaults to "#000000".
+        arc_clr (str, optional): Hex color to fill the slice with. Defaults to "#ffffff".
+        gradient (Union[str, BytesIO], optional): Path/Bytes of the gradient image to be used. Defaults to None.
 
-    Returns
-    -------
-    Image.Image
-        An Image with a slice on it.
+    Returns:
+        Tuple[Image.Image, Image.Image]: A tuple containing the actual image as the first element and its maask as the second.
     """
 
     # other conf
@@ -82,33 +63,22 @@ def create_slice(angle: float,
 
     progress_slice_drawing.text((txt_x, txt_y), txt, fill=txt_color, font=font)
     progress_slice = progress_slice.resize(base_size, Image.LANCZOS)
+    progress_slice_mask = create_circular_mask(progress_slice.size, angle)
 
-    return progress_slice
+    return (progress_slice, progress_slice_mask)
 
-def composite_avatar(og_avatar: Union[str, BytesIO],
-                     slice_img: Image.Image,
-                     slice_angle: float,
-                     gradient: Union[str, BytesIO] = None,
-                     base_clr: str = None) -> Image.Image:
-    """Return a final transparent composite image.
+def composite_avatar(og_avatar: Union[str, BytesIO], slice_img: Image.Image, slice_mask: Image.Image, gradient: Union[str, BytesIO] = None, base_clr: str = None) -> Image.Image:
+    """Create a final composite avatar to be uploaded.
 
-    Parameters
-    ----------
-    og_avatar : Union[str, BytesIO]
-        Untouched avatar's path/bytes.
-    slice_img : Image.Image
-        Slice image to paste.
-    slice_angle : float
-        Slice angle in the `slice_img` to create mask.
-    gradient : Union[str, BytesIO], optional
-        Gradient file's path/bytes, by default None
-    base_clr : str, optional
-        Hex color to fill the base image, by default None
+    Args:
+        og_avatar (Union[str, BytesIO]): Path/Bytes of the untouched avatar.
+        slice_img (Image.Image): The slice image to use in the composite.
+        slice_mask (Image.Image): `slice_img`'s mask..
+        gradient (Union[str, BytesIO], optional): Path/Bytes of the gradient image. Defaults to None.
+        base_clr (str, optional): Hex color to fill the slice with. Defaults to None.
 
-    Returns
-    -------
-    Image.Image
-        A final transparent composite image.
+    Returns:
+        Image.Image: A final composite avatar.
     """
 
     transparent_base = Image.new(mode="RGBA", size=base_size, color=(0,0,0,0))
@@ -125,7 +95,7 @@ def composite_avatar(og_avatar: Union[str, BytesIO],
     x = (bg_w-350)//2 # center the avatar
     y = (bg_h-350)//2
 
-    base_img.paste(im=slice_img, box=(0, 0), mask=create_circular_mask(slice_img.size, slice_angle))
+    base_img.paste(im=slice_img, box=(0, 0), mask=slice_mask)
     base_img.paste(im=avatar, box=(x,y), mask=create_circular_mask(avatar.size))
     transparent_base.paste(im=base_img, box=(0, 0), mask=create_circular_mask(base_img.size))
 

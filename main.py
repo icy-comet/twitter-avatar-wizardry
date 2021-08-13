@@ -11,13 +11,14 @@ db_key = "twitter-progress-bar"
 
 @app.lib.run(action="update")
 @app.lib.cron()
-def cron_job(event: Any):
-    """Run at set intervals and update image and cache as required.
+def cron_job(event: Any) -> str:
+    """Run at set intervals and run updates as necessary.
 
-    Parameters
-    ----------
-    event : Any
-        An object passed by Deta that includes the event's payload (if any) and its type.
+    Args:
+        event (Any): An object passed by Deta containing even't payload (if any) and the type.
+
+    Returns:
+        str: Feedback on the actions carried out.
     """
     user = User()
     cache: dict = db.get(db_key)
@@ -36,13 +37,13 @@ def cron_job(event: Any):
         return "No Updates"
 
 @app.lib.run(action="reset-count")
-def run_now(event):
-    """ Manipulate cached progress to force update on next CRON. """
+def run_now(event: Any) -> str:
+    """ Manipulate cached progress to force an update on next CRON. """
     db.update({"percent_progress": 0}, db_key)
     return "Count Reset"
 
 @app.lib.run(action="full-reset")
-def full_reset(event):
+def full_reset(event: Any) -> str:
     """ Empty the entire cache. """
     db.put({"percent_progress": 0, "og_avatar": "", "avatar_url": ""}, db_key)
     return "Full Reset"
