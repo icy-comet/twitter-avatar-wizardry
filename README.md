@@ -8,7 +8,7 @@ The app (once deployed) automatically updates your Twitter profile image as your
 
 [![Deploy](https://button.deta.dev/1/svg)](https://go.deta.dev/deploy)
 
-<a href="https://www.buymeacoffee.com/anikett" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+<a href="https://www.buymeacoffee.com/anikett" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" alt="Buy Me A Coffee" height="41" width="190"></a>
 
 # Setup
 
