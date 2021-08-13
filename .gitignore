@@ -4,3 +4,4 @@ venv/
 .vscode/
 tmp*
 .deta/
+__pycache__/

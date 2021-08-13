@@ -5,6 +5,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 # Base conf
 h_w = 400 # square image
+avatar_h_w = 360
 base_size = (h_w, h_w)
 
 def create_circular_mask(size: Tuple[float, float], angle: Optional[float] = 360) -> Image.Image:
@@ -24,14 +25,14 @@ def create_circular_mask(size: Tuple[float, float], angle: Optional[float] = 360
     ImageDraw.Draw(alpha_image).pieslice([(0, 0), mask_size], start=-90, end=angle-90, fill=255)
     return alpha_image.resize(size=size, resample=Image.LANCZOS)
 
-def create_slice(angle: float, txt: str, font_file: str, txt_color: str = "#000000", arc_clr: str = "#ffffff", gradient: Union[str, BytesIO] = None) -> Tuple[Image.Image, Image.Image]:
+def create_slice(angle: float, txt: str, font_file: str, txt_color: str = "#ffffff", arc_clr: str = "#ffffff", gradient: Union[str, BytesIO] = None) -> Tuple[Image.Image, Image.Image]:
     """Create a new image with a pieslice and its mask.
 
     Args:
         angle (float): The angle the pieslice will cover out of 360.
         txt (str): Percent text to print on the slice.
         font_file (str): Path to the font's file to be used.
-        txt_color (str, optional): Text's color. Defaults to "#000000".
+        txt_color (str, optional): Text's color. Defaults to "#ffffff".
         arc_clr (str, optional): Hex color to fill the slice with. Defaults to "#ffffff".
         gradient (Union[str, BytesIO], optional): Path/Bytes of the gradient image to be used. Defaults to None.
 
@@ -46,12 +47,12 @@ def create_slice(angle: float, txt: str, font_file: str, txt_color: str = "#0000
 
     # R = Pieslice Radius/half of the image dimensions - 40 visible ring's width + 2 offset
     # center_x & center_y don't equal R in a rectangle
-    R = center_x = center_y = pieslice_radius - 40 + 2
+    R = center_x = center_y = pieslice_radius - 30 + 2
 
-    # -90 to start from top,-5 to offset text for readability
-    # +5 to offset final co-ordinates for readability
-    txt_x = math.ceil(R * math.cos(math.radians(angle - 90 - 5)) + center_x + 5)
-    txt_y = math.ceil(R * math.sin(math.radians(angle - 90 - 5)) + center_y + 5)
+    # -90 to start from top, -5 to offset text for readability
+    # +4 to offset final co-ordinates for readability
+    txt_x = math.ceil(R * math.cos(math.radians(angle - 90 - 5)) + center_x + 4)
+    txt_y = math.ceil(R * math.sin(math.radians(angle - 90 - 5)) + center_y + 4)
 
     if not gradient:
         progress_slice = Image.new(mode="RGBA", size=upscaled_size, color=(0, 0, 0, 0))
@@ -82,7 +83,7 @@ def composite_avatar(og_avatar: Union[str, BytesIO], slice_img: Image.Image, sli
     """
 
     transparent_base = Image.new(mode="RGBA", size=base_size, color=(0,0,0,0))
-    og_avatar_size = (350, 350)
+    og_avatar_size = (avatar_h_w, avatar_h_w)
     avatar = Image.open(og_avatar).convert("RGB").resize(og_avatar_size, Image.LANCZOS)
 
     if gradient:
@@ -92,8 +93,8 @@ def composite_avatar(og_avatar: Union[str, BytesIO], slice_img: Image.Image, sli
 
     bg_w, bg_h = base_img.size
     # avatar paste coordinates
-    x = (bg_w-350)//2 # center the avatar
-    y = (bg_h-350)//2
+    x = (bg_w-avatar_h_w)//2 # center the avatar
+    y = (bg_h-avatar_h_w)//2
 
     base_img.paste(im=slice_img, box=(0, 0), mask=slice_mask)
     base_img.paste(im=avatar, box=(x,y), mask=create_circular_mask(avatar.size))

@@ -2,7 +2,7 @@ class Config:
     """ App configuration """
 
     track_mark: int = 100 # reset ring for every 100 followers
-    txt_color: str = "#000000" # hex color of the percent txt
+    txt_color: str = "#ffffff" # hex color of the percent txt
     
     use_gradient: bool = True # use gradient images
 
