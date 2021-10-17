@@ -41,29 +41,27 @@ def create_slice(angle: float, txt: str, font_file: str, txt_color: str = "#ffff
     """
 
     # other conf
-    font = ImageFont.truetype(font_file, 30)
+    font = ImageFont.truetype(font_file, 10)
     upscaled_size = (h_w*3, h_w*3)
-    pieslice_radius = (h_w*3)//2
 
-    # R = Pieslice Radius/half of the image dimensions - 40 visible ring's width + 2 offset
-    # center_x & center_y don't equal R in a rectangle
-    R = center_x = center_y = pieslice_radius - 30 + 2
+    # R = pieslice radius or half of the image dimensions - (10) visible ring's width
+    # Calculated for base_size to avoid blurring text on resize
+    # center_x & center_y aren't equal to R in a rectangle
+    pieslice_radius = h_w//2
+    R = center_x = center_y = pieslice_radius - 10
 
     # -90 to start from top, -5 to offset text for readability
-    # +4 to offset final co-ordinates for readability
-    txt_x = math.ceil(R * math.cos(math.radians(angle - 90 - 5)) + center_x + 4)
-    txt_y = math.ceil(R * math.sin(math.radians(angle - 90 - 5)) + center_y + 4)
+    txt_x = math.ceil(R * math.cos(math.radians(angle - 90 - 5)) + center_x)
+    txt_y = math.ceil(R * math.sin(math.radians(angle - 90 - 5)) + center_y)
 
     if not gradient:
         progress_slice = Image.new(mode="RGBA", size=upscaled_size, color=(0, 0, 0, 0))
-        progress_slice_drawing = ImageDraw.Draw(progress_slice)
-        progress_slice_drawing.pieslice(((0,0), upscaled_size), start=-90, end=angle-90, fill=arc_clr)
+        ImageDraw.Draw(progress_slice).pieslice(((0,0), upscaled_size), start=-90, end=angle-90, fill=arc_clr)
     else:
         progress_slice = Image.open(gradient).resize(upscaled_size, Image.LANCZOS)
-        progress_slice_drawing = ImageDraw.Draw(progress_slice)
 
-    progress_slice_drawing.text((txt_x, txt_y), txt, fill=txt_color, font=font)
     progress_slice = progress_slice.resize(base_size, Image.LANCZOS)
+    ImageDraw.Draw(progress_slice).text((txt_x, txt_y), txt, fill=txt_color, font=font)
     progress_slice_mask = create_circular_mask(progress_slice.size, angle)
 
     return (progress_slice, progress_slice_mask)

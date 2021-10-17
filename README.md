@@ -15,7 +15,7 @@ The app (once deployed) automatically updates your Twitter profile image as your
 ## Deployment
 You can deploy the app on a Deta Micro. It uses a Deta Base to cache the progress and the untouched avatar.
 
-Note: Since it doesn't expose any HTTP endpoints, I suggest leaving `deta auth` enabled.
+Note: You can enable `deta auth` for endpoints.
 
 ## Loading secret keys
 All secret keys are to be loaded as environment variables.
@@ -64,7 +64,21 @@ deta run reset-count
 ```
 
 ## Installing Requirements (for development)
-After creating a virtual environment and activating it, simply run:
+Create a virtual environment with:
+```
+python -m venv venv
+```
+Activate it:
+```
+source ./venv/bin/activate
+```
+And run:
 ```
 pip install -r requirements.txt
+```
+
+## Debug Image Creation
+To create and save image to a local directory (for debugging), run:
+```
+python local.py
 ```
