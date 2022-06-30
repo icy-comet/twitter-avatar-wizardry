@@ -2,7 +2,7 @@
 
 > Track your Twitter progress right in your profile image!
 
-![example](example_img.png)
+<img src="example_img.png" alt="example" style="width: 200px;">
 
 The app (once deployed) automatically updates your Twitter profile image as your followers change to reflect your Twitter progress with a progress bar!
 
