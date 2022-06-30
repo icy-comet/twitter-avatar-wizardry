@@ -1,7 +1,6 @@
 .env
 *.code-workspace
 venv/
-.vscode/
 tmp*
 .deta/
 __pycache__/
