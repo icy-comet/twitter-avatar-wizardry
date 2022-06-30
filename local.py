@@ -1,8 +1,8 @@
 from image import create_slice, composite_avatar
 from config import Config
 
-angle = 360
-txt = "100%"
+angle = 234
+txt = "65%"
 og_avatar = "raw_avatar.png"
 
 slice_img, slice_mask = create_slice(angle,
